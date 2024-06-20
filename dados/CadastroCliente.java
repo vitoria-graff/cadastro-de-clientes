@@ -48,9 +48,12 @@ public class CadastroCliente implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource()==confirmarButton){
+            cadastarCliente();
             }
         else if (e.getSource()==limparButton){
-
+            textCodigo.setText("");
+            textNome.setText("");
+            textArea1.setText("");
         }
         else if (e.getSource()==mostrarDadosButton){
 
@@ -62,16 +65,38 @@ public class CadastroCliente implements ActionListener {
     private void cadastarCliente(){
         try {
             int codigo = Integer.parseInt(textCodigo.getText());
-            String nome= textNome.getText();
-            if (existeCodigo(codigo)){
-                textArea1.append("Erro! Já existe um evento com esse código."+"\n");
+            String nome = textNome.getText();
+            if (existeCodigo(codigo)) {
+                textArea1.append("Erro! Já existe um cliente com esse código.\n");
+            } else {
+                if (individualRadioButton.isSelected()) {
+                    String cpf = JOptionPane.showInputDialog(panel, "Digite o CPF do cliente individual:");
+                    if (cpf != null && !cpf.isEmpty()) {
+                        clientes.add(new Individual(codigo, nome, cpf));
+                        Collections.sort(clientes);
+                        textArea1.append("Cliente cadastrado com sucesso.\n");
+                    } else {
+                        textArea1.append("Erro! CPF não pode estar vazio.\n");
+                    }
+                } else if (empresarialRadioButton.isSelected()) {
+                    try {
+                        int anoFundacao = Integer.parseInt(JOptionPane.showInputDialog(panel, "Digite o ano de fundação da empresa:"));
+                        clientes.add(new Empresarial(codigo, nome, anoFundacao));
+                        Collections.sort(clientes);
+                        textArea1.append("Cliente cadastrado com sucesso.\n");
+                    } catch (NumberFormatException e) {
+                        textArea1.append("Erro! Ano de fundação deve ser um número inteiro.\n");
+                    }
+                }
             }
-
-        } catch (Exception e) {
-
+            textCodigo.setText("");
+            textNome.setText("");
+        } catch (NumberFormatException e) {
+            textArea1.append("Erro! Código deve ser um número inteiro.\n");
         }
 
     }
+
     private boolean existeCodigo(int codigo){
         for(Cliente cliente: clientes){
             if (cliente.getCodigo()==codigo){

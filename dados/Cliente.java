@@ -1,6 +1,6 @@
 package dados;
 
-public abstract class Cliente {
+public abstract class Cliente implements Comparable<Cliente> {
     private int codigo;
     private String nome;
     public Cliente(int codigo, String nome){
@@ -17,4 +17,7 @@ public abstract class Cliente {
     }
 
     public abstract double calculaDesconto();
+
+    @Override
+    public abstract int compareTo(Cliente o);
 }
