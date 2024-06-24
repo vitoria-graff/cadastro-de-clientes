@@ -21,6 +21,16 @@ public class CadastroCliente implements ActionListener {
     ArrayList<Cliente>clientes = new ArrayList<>();
 
     public CadastroCliente(){
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         confirmarButton.addActionListener(this);
         mostrarDadosButton.addActionListener(this);
@@ -56,7 +66,22 @@ public class CadastroCliente implements ActionListener {
             textArea1.setText("");
         }
         else if (e.getSource()==mostrarDadosButton){
-
+            Collections.sort(clientes);
+            textArea1.setText("");
+            for (Cliente cliente : clientes) {
+                textArea1.append("Código: " + cliente.getCodigo() + "\n");
+                textArea1.append("Nome: " + cliente.getNome() + "\n");
+                if (cliente instanceof Individual) {
+                    Individual individual = (Individual) cliente;
+                    textArea1.append("Tipo: Individual\n");
+                    textArea1.append("CPF: " + individual.getCpf() + "\n");
+                } else if (cliente instanceof Empresarial) {
+                    Empresarial empresarial = (Empresarial) cliente;
+                    textArea1.append("Tipo: Empresarial\n");
+                    textArea1.append("Ano de Fundação: " + empresarial.getAno() + "\n");
+                }
+                textArea1.append("\n");
+            }
         }
         else if (e.getSource()==finalizarButton){
             System.exit(0);
@@ -66,11 +91,15 @@ public class CadastroCliente implements ActionListener {
         try {
             int codigo = Integer.parseInt(textCodigo.getText());
             String nome = textNome.getText();
+            if (nome.isEmpty() || (!individualRadioButton.isSelected() && !empresarialRadioButton.isSelected())) {
+                textArea1.append("Erro! Todos os campos devem estar preenchidos.\n");
+                return;
+            }
             if (existeCodigo(codigo)) {
                 textArea1.append("Erro! Já existe um cliente com esse código.\n");
             } else {
                 if (individualRadioButton.isSelected()) {
-                    String cpf = JOptionPane.showInputDialog(panel, "Digite o CPF do cliente individual:");
+                    String cpf = JOptionPane.showInputDialog(panel, "Digite o CPF do cliente:");
                     if (cpf != null && !cpf.isEmpty()) {
                         clientes.add(new Individual(codigo, nome, cpf));
                         Collections.sort(clientes);
@@ -80,12 +109,12 @@ public class CadastroCliente implements ActionListener {
                     }
                 } else if (empresarialRadioButton.isSelected()) {
                     try {
-                        int anoFundacao = Integer.parseInt(JOptionPane.showInputDialog(panel, "Digite o ano de fundação da empresa:"));
-                        clientes.add(new Empresarial(codigo, nome, anoFundacao));
+                        int ano = Integer.parseInt(JOptionPane.showInputDialog(panel, "Digite o ano de fundação da empresa:"));
+                        clientes.add(new Empresarial(codigo, nome, ano));
                         Collections.sort(clientes);
                         textArea1.append("Cliente cadastrado com sucesso.\n");
                     } catch (NumberFormatException e) {
-                        textArea1.append("Erro! Ano de fundação deve ser um número inteiro.\n");
+                        textArea1.append("Erro! Ano deve ser um número inteiro.\n");
                     }
                 }
             }
